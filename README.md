@@ -1,8 +1,7 @@
-
 # Simple DB Operation
 
 
-Basic Usage
+Usage
 
     <?php
     use  Classes\Irfa\DBOperation as DB;
@@ -33,12 +32,3 @@ Order by
     DB::table('tb_stok')
 	->where(['book_id' => ABC123])
 	->update($params);
-<?php
-use  Classes\Irfa\DBOperation as DB;
-
-$res = DB::table('book')->get();
-
- foreach ($res as $r):
-    echo $r->title."<br>";
-  endforeach;
-  
