@@ -11,6 +11,7 @@ Config file :  Irfa/config/database.php
 	    'DB_username' => 'yourusername',
 	    'DB_password' => 'yourpassword',
 	    'DB_port' => '3306',
+	    'DB_driver' => 'mysql',
 	   ];
 
 **<h2>Basic Usage</h2>**
