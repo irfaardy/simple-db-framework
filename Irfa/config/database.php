@@ -11,4 +11,6 @@ $config = [
 
 			'DB_port' => '3306',
 
+			'DB_driver' => 'mysql',
+
 ];
