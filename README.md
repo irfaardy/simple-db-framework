@@ -10,7 +10,24 @@ Usage
      foreach ($res as $r):
         echo $r->title."<br>";
       endforeach;
+	
+Fetch Single row
 
+ 
+
+      $data= DB::table('book')
+        	->where(['book_id' => ABC123])
+        	->first();
+        	
+        	echo $data['title'];
+Select Field
+
+      $data= DB::table('book')
+	        ->select(['book_id','title','synopsis'])
+        	->where(['book_id' => ABC123])
+        	->first();
+        	
+        	echo $data['title'];
 Order by
 
  
@@ -29,6 +46,13 @@ Order by
  
 
     $params = ['title'=>'Ipsum', 'author' => 'Lorem'];
-    DB::table('tb_stok')
+    DB::table('book')
 	->where(['book_id' => ABC123])
 	->update($params);
+	
+Delete data
+
+    DB::table('book')
+    	->where(['book_id' => ABC123])
+    	->delete();
+
