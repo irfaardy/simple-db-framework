@@ -1,7 +1,8 @@
 # Simple DB Operation
 
 **Configuration**
-open file in Irfa/config/database.php
+
+Config file :  Irfa/config/database.php
 
     <?php
     $config = [
@@ -69,3 +70,4 @@ open file in Irfa/config/database.php
     DB::table('book')
     	->where(['book_id' => ABC123])
     	->delete();
+
