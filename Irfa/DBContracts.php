@@ -1,5 +1,5 @@
 <?php
-namespace Classes\Irfa;
+namespace Irfa;
 
 interface DBContracts{
 	public static function table($table);

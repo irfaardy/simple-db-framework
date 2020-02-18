@@ -1,10 +1,8 @@
 <?php
 /* DB Connection
 Author:Irfa Ardiansyah <irfaardiansyah95@gmail.com>
-Kelas : TIF CID RP 17 B
-NPM : 17 111 057
 */
- namespace Classes\Irfa;
+ namespace Irfa;
  use PDO;
  class DBConnection {
  
@@ -12,7 +10,7 @@ NPM : 17 111 057
 
  	protected function connect(){
  		try {
- 			include "./config/database.php";
+ 			include "config/database.php";
 		    $conn = new PDO("mysql:".$config['DB_host']."=;dbname=".$config['DB_name'], $config['DB_username'], $config['DB_password']);
 		    
 		    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);

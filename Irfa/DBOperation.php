@@ -1,11 +1,9 @@
 <?php
 /* DB Operation Framework
 	Author:Irfa Ardiansyah <irfaardiansyah95@gmail.com>
-	Kelas : TIF CID RP 17 B
-	NPM : 17 111 057
 */
- namespace Classes\Irfa;
- use Classes\Irfa\DBConnection as Conn;
+ namespace Irfa;
+ use Irfa\DBConnection as Conn;
  use PDO;
 
 class DBOperation extends DBConnection {
