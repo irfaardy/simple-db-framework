@@ -32,7 +32,7 @@ Config file :  Irfa/config/database.php
  
 
       $data= DB::table('book')
-        	->where(['book_id' => ABC123])
+        	->where(['book_id' => 'ABC123'])
         	->first();
         	
         	echo $data['title'];
@@ -40,7 +40,7 @@ Config file :  Irfa/config/database.php
 
       $data= DB::table('book')
 	        ->select(['book_id','title','synopsis'])
-        	->where(['book_id' => ABC123])
+        	->where(['book_id' => 'ABC123'])
         	->first();
         	
         	echo $r['book_id'].' '.$data['title'].' '.$r['author'];
