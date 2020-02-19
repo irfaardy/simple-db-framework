@@ -63,12 +63,12 @@ Config file :  Irfa/config/database.php
 
     $params = ['title'=>'Ipsum', 'author' => 'Lorem'];
     DB::table('book')
-	->where(['book_id' => ABC123])
+	->where(['book_id' => 'ABC123'])
 	->update($params);
 	
 **Delete data**
 
     DB::table('book')
-    	->where(['book_id' => ABC123])
+    	->where(['book_id' => 'ABC123'])
     	->delete();
 
