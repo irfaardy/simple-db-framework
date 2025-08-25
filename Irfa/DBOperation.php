@@ -330,6 +330,10 @@ class DBOperation extends DBConnection {
 
 /////////////PRIVATE METHOD////////////////	
 
+	private static function sanitizeIdentifier($str){
+		return preg_replace('/[^a-zA-Z0-9_\.]/', '', $str);
+	}
+
 	private static function GabungkanJoin(){
 		$InnerJ="";
 		$RightJ="";
