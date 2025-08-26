@@ -12,7 +12,7 @@ Author:Irfa Ardiansyah <irfaardiansyah95@gmail.com>
  		try {
  			include "config/database.php";
 		    if($config['DB_driver'] == 'mysql'){
-		    	$conn = new PDO("mysql:".$config['DB_host']."=;dbname=".$config['DB_name'], $config['DB_username'], $config['DB_password']);
+			$conn = new PDO("mysql:host=".$config['DB_host'].";dbname=".$config['DB_name'], $config['DB_username'], $config['DB_password']);
 		    } elseif($config['DB_driver'] == 'pgsql'){
 			$conn = new PDO("pgsql:dbname=".$config['DB_name'].";host=".$config['DB_host'], $config['DB_username'],  $config['DB_password']); 
 			} else{

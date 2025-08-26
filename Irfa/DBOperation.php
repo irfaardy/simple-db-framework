@@ -27,27 +27,27 @@ class DBOperation extends DBConnection {
  	 private static $rawQuery;
 	///Definisi tabel table(nama tabel)
 	public static function table($table){
-	 	self::$table = $table;
+		self::$table = self::sanitizeIdentifier($table);
 	 	return new static();
 	}
 	///Definisi tabel join(nama tabel,kuncinya)
 	public static function join($table,$on){
-		self::$InnerJoin[$table] = $on;
+		self::$InnerJoin[self::sanitizeIdentifier($table)] = $on;
 		return new static();
 	}
 	///Definisi tabel leftjoin(nama tabel,kuncinya)
 	public static function leftJoin($table,$on){
-		self::$leftJoin[$table] = $on;
+		self::$leftJoin[self::sanitizeIdentifier($table)] = $on;
 		return new static();
 	}
 	///Definisi tabel rightjoin(nama tabel,kuncinya)
 	public static function rightJoin($table,$on){
-		self::$rightJoin[$table] = $on;
+		self::$rightJoin[self::sanitizeIdentifier($table)] = $on;
 		return new static();
 	}
 	///Definisi tabel crossjoin(nama tabel,kuncinya)
 	public static function crossJoin($table,$on){
-		self::$crossJoin[$table] = $on;
+		self::$crossJoin[self::sanitizeIdentifier($table)] = $on;
 		return new static();
 	}
 	///Definisi tabel limit(batas maksimal yang ditampilkan)
@@ -56,16 +56,39 @@ class DBOperation extends DBConnection {
 		return new static();
 	}
 	public static function groupBy($group){
-		self::$grpBy = $group;
+		if(is_array($group)){
+			$sanitized_group = [];
+			foreach ($group as $g) {
+				$sanitized_group[] = self::sanitizeIdentifier($g);
+			}
+			self::$grpBy = $sanitized_group;
+		} else {
+			self::$grpBy = [self::sanitizeIdentifier($group)];
+		}
 		return new static();
 	}
+	/**
+	 * Executes a raw SQL query.
+	 *
+	 * @param string $query The raw SQL query to execute.
+	 * @return static
+	 *
+	 * @warning This method is highly vulnerable to SQL injection if user input is incorporated into the query string.
+	 * It is strongly recommended to use the other query builder methods provided by this class to ensure safety.
+	 * If you must use this method, ensure that all data is properly sanitized or use PDO with manual parameter binding.
+	 * The query builder's `where` clause and other methods do not work with `query()`.
+	 */
 	public static function query($query){
 		self::$rawQuery= $query;
 		return new static();
 	}
 	///Definisi orderBy(nama kolom, urutkan menaik atau menurun)
 	public static function orderBy($orderBy,$sort = "DESC"){
-		self::$orderBy=' ORDER BY '.$orderBy.' '.$sort;
+		$sort = strtoupper($sort);
+		if ($sort !== 'ASC' && $sort !== 'DESC') {
+			$sort = 'DESC';
+		}
+		self::$orderBy=' ORDER BY '.self::sanitizeIdentifier($orderBy).' '.$sort;
 		return new static();
 	}
 	///Definisi tabel select(pilih kolom contoh: ['nama','username'])
@@ -75,7 +98,11 @@ class DBOperation extends DBConnection {
 			$col_lst="";
 			foreach ($params as $i )
 			{
-				$col_lst .= $i .",";
+				if($i === "*"){
+					$col_lst .= "*,";
+				} else {
+					$col_lst .= self::sanitizeIdentifier($i) .",";
+				}
 			}
 			$col = rtrim($col_lst,",");
 			self::$select = $col;
@@ -91,7 +118,7 @@ class DBOperation extends DBConnection {
 			foreach ($params as $i => $item)
 			{
 				$d++;
-			    $col = $i;
+			    $col = self::sanitizeIdentifier($i);
 			    $key = ":id_".str_replace(".", "_", $i)."_".$d."_".time();
 			    $in .= $key.",";
 			    $col_lst .= $col."=".$key." AND ";
@@ -127,17 +154,22 @@ class DBOperation extends DBConnection {
 			foreach ($params as $i => $item)
 			{
 				$d++;
-			    $col = $i;
+			    $col = self::sanitizeIdentifier($i);
 			    $key = ":id_".str_replace(".", "_", $i)."_".$d."_".time();
 			    $in .= $key.",";
 			    if($wildcard=="after"){
-			    	$col_lst .= $col."like ".$key."% OR ";
+				$col_lst .= $col." LIKE ".$key." OR ";
+					self::$mergeCol[$key] = $item."%";
 				} else if($wildcard == "before"){
-					$col_lst .= $col."like %".$key." OR ";
+					$col_lst .= $col." LIKE ".$key." OR ";
+					self::$mergeCol[$key] = "%".$item;
 				} else if($wildcard == "both"){
-					$col_lst .= $col."like %".$key."% OR ";
+					$col_lst .= $col." LIKE ".$key." OR ";
+					self::$mergeCol[$key] = "%".$item."%";
+				} else {
+					$col_lst .= $col." LIKE ".$key." OR ";
+					self::$mergeCol[$key] = $item;
 				} 
-			    self::$mergeCol[$key] = $item; 
 			}
 			$in = rtrim($in,","); 
 			$col = rtrim($col_lst," OR ");
@@ -155,20 +187,25 @@ class DBOperation extends DBConnection {
 			foreach ($params as $i => $item)
 			{
 				$d++;
-			    $col = $i;
+			    $col = self::sanitizeIdentifier($i);
 			    $key = ":id_".str_replace(".", "_", $i)."_".$d."_".time();
 			    $in .= $key.",";
 			    if($wildcard=="after"){
-			    	$col_lst .= $col."like ".$key."% AND ";
+				$col_lst .= $col." LIKE ".$key." AND ";
+					self::$mergeCol[$key] = $item."%";
 				} else if($wildcard == "before"){
-					$col_lst .= $col."like %".$key." AND ";
+					$col_lst .= $col." LIKE ".$key." AND ";
+					self::$mergeCol[$key] = "%".$item;
 				} else if($wildcard == "both"){
-					$col_lst .= $col."like %".$key."% AND ";
-				} 
-			    self::$mergeCol[$key] = $item; 
+					$col_lst .= $col." LIKE ".$key." AND ";
+					self::$mergeCol[$key] = "%".$item."%";
+				} else {
+					$col_lst .= $col." LIKE ".$key." AND ";
+					self::$mergeCol[$key] = $item;
+				}
 			}
 			$in = rtrim($in,","); 
-			$col = rtrim($col_lst," OR ");
+			$col = rtrim($col_lst," AND ");
 			// self::$mergeCol = $values;
 			self::$colvalLike = $col;
 
@@ -183,7 +220,7 @@ class DBOperation extends DBConnection {
 			foreach ($params as $i => $item)
 			{
 				$d++;
-			    $col = $i;
+			    $col = self::sanitizeIdentifier($i);
 			    $key = ":id_".str_replace(".", "_", $i)."_".$d."_".time();
 			    $in .= $key.",";
 			    $col_lst .= $col."=".$key." OR ";
@@ -257,7 +294,7 @@ class DBOperation extends DBConnection {
 				foreach ($p as $i => $item)
 				{
 
-				    $col = $i;
+				    $col = self::sanitizeIdentifier($i);
 				    $key = ":id_".$i;
 				    $in .= $key.",";
 				    $col_lst .= $col.",";
@@ -296,7 +333,7 @@ class DBOperation extends DBConnection {
 				foreach ($p as $i => $item)
 				{
 					$d++;
-				    $col = $i;
+				    $col = self::sanitizeIdentifier($i);
 				    $key = ":upd_".str_replace(".", "_", $i)."_".$d."_".time();
 				    $in .= $col."=".$key.",";
 				    $col_lst .= $col.",";
